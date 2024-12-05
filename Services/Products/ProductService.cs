@@ -1,12 +1,11 @@
-﻿using System.Net;
-using App.Repositories;
+﻿using App.Repositories;
 using App.Repositories.Products;
-using AppServices.ExceptionHandler;
 using AppServices.Products.Create;
 using AppServices.Products.Update;
 using AppServices.Products.UpdateStock;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace AppServices.Products;
 
@@ -43,12 +42,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
             return ServiceResult<CreateProductResponse>.Failure("Ürün ismi veritabanında bulunmaktadır.", HttpStatusCode.BadRequest);
         }
 
-        var product = new Product
-        {
-            Name = request.Name,
-            Price = request.Price,
-            Stock = request.Stock
-        };
+        var product = mapper.Map<Product>(request);
 
         await productRepository.AddAsync(product);
         await unitOfWork.SaveChangesAsync();
@@ -58,7 +52,6 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
     public async Task<ServiceResult> UpdateAsync(int id, UpdateProductRequest request)
     {
         //Fast fail: Önce başarısız durumu döneriz. Daha sonra olumlu durumları döneriz.
-
         //Guard Clause : else olmadan yazılan if bloğu.
 
         var product = await productRepository.GetByIdAsync(id);
@@ -73,9 +66,11 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
             return ServiceResult.Failure("Ürün ismi veritabanında bulunmaktadır.", HttpStatusCode.BadRequest);
         }
 
-        product.Name = request.Name;
-        product.Price = request.Price;
-        product.Stock = request.Stock;
+        //product.Name = request.Name;
+        //product.Price = request.Price;
+        //product.Stock = request.Stock;
+
+        product = mapper.Map(request, product);
 
         productRepository.Update(product);
         await unitOfWork.SaveChangesAsync();
