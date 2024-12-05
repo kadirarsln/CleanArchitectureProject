@@ -1,8 +1,10 @@
 ﻿using System.Net;
 using App.Repositories;
 using App.Repositories.Products;
+using AppServices.ExceptionHandler;
 using AppServices.Products.Create;
 using AppServices.Products.Update;
+using AppServices.Products.UpdateStock;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,8 +35,10 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
     }
     public async Task<ServiceResult<CreateProductResponse>> CreateAsync(CreateProductRequest request)
     {
-        var anyProduct = await productRepository.Where(p => p.Name == request.Name).AnyAsync();
-        if (anyProduct)
+        //throw new CriticalException("Kritik seviye hata meydana geldi.");
+
+        var isProductNameExist = await productRepository.Where(p => p.Name == request.Name).AnyAsync();
+        if (isProductNameExist)
         {
             return ServiceResult<CreateProductResponse>.Failure("Ürün ismi veritabanında bulunmaktadır.", HttpStatusCode.BadRequest);
         }
@@ -58,10 +62,15 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
         //Guard Clause : else olmadan yazılan if bloğu.
 
         var product = await productRepository.GetByIdAsync(id);
-
         if (product is null)
         {
             return ServiceResult.Failure("Product not found", HttpStatusCode.NotFound);
+        }
+
+        var isProductNameExist = await productRepository.Where(p => p.Name == request.Name && p.Id != product.Id).AnyAsync();
+        if (isProductNameExist)
+        {
+            return ServiceResult.Failure("Ürün ismi veritabanında bulunmaktadır.", HttpStatusCode.BadRequest);
         }
 
         product.Name = request.Name;

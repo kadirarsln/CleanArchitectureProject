@@ -1,4 +1,4 @@
-﻿namespace AppServices.Products.Update;
+﻿namespace AppServices.Products.UpdateStock;
 
 public record UpdateProductStockRequest(int ProductId, int Stock);
 

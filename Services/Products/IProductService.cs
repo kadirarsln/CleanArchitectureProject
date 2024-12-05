@@ -1,5 +1,6 @@
 ﻿using AppServices.Products.Create;
 using AppServices.Products.Update;
+using AppServices.Products.UpdateStock;
 
 namespace AppServices.Products;
 

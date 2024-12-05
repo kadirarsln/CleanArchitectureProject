@@ -1,6 +1,7 @@
 ﻿using AppServices.Products;
 using AppServices.Products.Create;
 using AppServices.Products.Update;
+using AppServices.Products.UpdateStock;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
